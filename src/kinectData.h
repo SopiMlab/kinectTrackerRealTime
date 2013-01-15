@@ -65,8 +65,8 @@ class kinectData{
     ofMesh points;
     vector<ofVec3f> coms;
     vector<cloud> meshes;
-    ofVec2f center;
-    ofVec2f ref;
+    ofVec3f center;
+    ofVec3f ref;
     
     ofMatrix4x4 M;
     ofColor c;
@@ -92,7 +92,7 @@ public:
             sender->setup(ip, port);
         }
     }
-    void setCenter(ofVec2f _c, ofVec2f _r){
+    void setCenter(ofVec3f _c, ofVec3f _r){
         ref = _r;
         center = _c;
     }
@@ -198,7 +198,7 @@ public:
         strcpy(comPosAll, "");
         for(int i = 0; i < N; i++){
             
-            ofVec2f pp;
+            ofVec3f pp;
             pp.x = coms[i].x - center.x;
             pp.y = coms[i].z - center.y;            
             if(i < coms.size()){

@@ -227,34 +227,7 @@ void testApp::update(){
     
     //writeLog();
     
-    // Set references COM0 from Kinect0
-    if(kinects[0].getCOMsize() > 0){
-        if(bSetCenter ) {
-            center = kinects[0].getCOM(0);
-            XML.setValue("CENTER_X", center.x);
-            XML.setValue("CENTER_Z", center.z);
-            XML.saveFile("xmlSettings.xml");
-        }
-        if(bSetRefPoint) {
-            refPoint = kinects[0].getCOM(0);
-            XML.setValue("REF_X", refPoint.x);
-            XML.setValue("REF_Z", refPoint.z);
-            XML.saveFile("xmlSettings.xml");
-        }
-        if(bSetGhost0) {
-            ghost0 = kinects[0].getCOM(0);
-            XML.setValue("GHOST_0_X", ghost0.x);
-            XML.setValue("GHOST_0_Z", ghost0.z);
-            XML.saveFile("xmlSettings.xml");
-        }
-        if(bSetGhost1) {
-            ghost1 = kinects[0].getCOM(0);
-            XML.setValue("GHOST_1_X", ghost1.x);
-            XML.setValue("GHOST_1_Z", ghost1.z);
-            XML.saveFile("xmlSettings.xml");
-        }
-    }
-    
+       
 }
 
 //--------------------------------------------------------------
@@ -459,10 +432,40 @@ void testApp::processOSC(){
                 }
             }
             
+            // Set references COM0 from Kinect0
+            if(kinects[0].getCOMsize() > 0){
+                if(bSetCenter) {
+                    center = kinects[0].getCOM(0);
+                    XML.setValue("CENTER_X", center.x);
+                    XML.setValue("CENTER_Z", center.z);
+                    XML.saveFile("xmlSettings.xml");
+                }
+                if(bSetRefPoint) {
+                    refPoint = kinects[0].getCOM(0);
+                    XML.setValue("REF_X", refPoint.x);
+                    XML.setValue("REF_Z", refPoint.z);
+                    XML.saveFile("xmlSettings.xml");
+                }
+                if(bSetGhost0) {
+                    ghost0 = kinects[0].getCOM(0);
+                    XML.setValue("GHOST_0_X", ghost0.x);
+                    XML.setValue("GHOST_0_Z", ghost0.z);
+                    XML.saveFile("xmlSettings.xml");
+                }
+                if(bSetGhost1) {
+                    ghost1 = kinects[0].getCOM(0);
+                    XML.setValue("GHOST_1_X", ghost1.x);
+                    XML.setValue("GHOST_1_Z", ghost1.z);
+                    XML.saveFile("xmlSettings.xml");
+                }
+            }
+
             
             if(_k == 0){ //Add ghost test users
                 if(bGhost0) kinects[0].addCOM(ghost0);
                 if(bGhost1) kinects[0].addCOM(ghost1);
+                
+                
             }
 
             
@@ -539,7 +542,7 @@ void testApp::sendAzimuts() {
     ofxOscMessage m;
     m.setAddress("/azimuts");
     for(int i = 0; i < N; i++){
-        ofVec2f v(trackers[i].lerpedPos.x - center.x, trackers[i].lerpedPos.z - center.y);
+        ofVec3f v(trackers[i].lerpedPos.x - center.x, 0, trackers[i].lerpedPos.z - center.z);
         float angle  = v.angle(-refVector);
         m.addFloatArg(angle);
         m.addFloatArg(v.length());
@@ -599,7 +602,7 @@ void testApp::writeLog(){
 //    //-------------------------
 //    // Writing machine learning data
 //   if(bTracking && bCalibrated){
-//        ofVec2f v(trackers[0].lerpedPos.x - center.x, trackers[0].lerpedPos.z - center.y);
+//        ofVec3f v(trackers[0].lerpedPos.x - center.x, 0, trackers[0].lerpedPos.z - center.y);
 //        float angle  = v.angle(-refVector);
 //      /*  state = 0;
 //        if(keys['1']) state = 1;
