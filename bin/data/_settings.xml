@@ -21,7 +21,7 @@
     </Button_Reset_Server_Counter>
     <SliderFloat_Zoom>
         <name>Zoom</name>
-        <value>-4949.84</value>
+        <value>1495.99</value>
     </SliderFloat_Zoom>
     <SliderFloat_camPosX>
         <name>camPosX</name>
@@ -33,11 +33,11 @@
     </SliderFloat_camPosY>
     <SliderFloat_camRotX>
         <name>camRotX</name>
-        <value>293.8</value>
+        <value>230.84</value>
     </SliderFloat_camRotX>
     <SliderFloat_camRotY>
         <name>camRotY</name>
-        <value>3.60009</value>
+        <value>1.8</value>
     </SliderFloat_camRotY>
     <Toggle_Lock_top_view>
         <name>Lock top view</name>

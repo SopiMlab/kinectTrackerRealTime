@@ -196,9 +196,11 @@ void testApp::update(){
         strcat(msg, kinectMsg);
     }
     char other[500];
-    sprintf(other, "\n[CENTER] %4.f, %4.f\n[REF POINT] %4.f, %4.f ", center.x, center.y, refPoint.x, refPoint.y);
+    sprintf(other, "\n[CENTER] %4.f, %4.f\n[REF POINT] %4.f, %4.f ", center.x, center.z, refPoint.x, refPoint.z);
     strcat(msg, other);
     
+    sprintf(other, "\n[GHOST 1] %4.f, %4.f\n[GHOST 2] %4.f, %4.f ", ghost0.x, ghost0.z, ghost1.x, ghost1.z);
+    strcat(msg, other);
     
     float delta[3];
     int n = 0;
