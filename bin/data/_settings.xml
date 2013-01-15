@@ -5,7 +5,7 @@
     </Toggle_TRACK>
     <Toggle_CALIBRATED>
         <name>CALIBRATED</name>
-        <value>1</value>
+        <value>0</value>
     </Toggle_CALIBRATED>
     <Toggle_SAVE>
         <name>SAVE</name>
@@ -15,28 +15,56 @@
         <name>Load MeshLab File</name>
         <value>0</value>
     </Button_Load_MeshLab_File>
-    <Button_Reset_player>
-        <name>Reset player</name>
+    <Button_Reset_Server_Counter>
+        <name>Reset Server Counter</name>
         <value>0</value>
-    </Button_Reset_player>
+    </Button_Reset_Server_Counter>
     <SliderFloat_Zoom>
         <name>Zoom</name>
-        <value>1369</value>
+        <value>-4949.84</value>
     </SliderFloat_Zoom>
     <SliderFloat_camPosX>
         <name>camPosX</name>
-        <value>-120</value>
+        <value>200</value>
     </SliderFloat_camPosX>
     <SliderFloat_camPosY>
         <name>camPosY</name>
-        <value>-56</value>
+        <value>-74</value>
     </SliderFloat_camPosY>
     <SliderFloat_camRotX>
         <name>camRotX</name>
-        <value>90</value>
+        <value>293.8</value>
     </SliderFloat_camRotX>
     <SliderFloat_camRotY>
         <name>camRotY</name>
-        <value>0</value>
+        <value>3.60009</value>
     </SliderFloat_camRotY>
+    <Toggle_Lock_top_view>
+        <name>Lock top view</name>
+        <value>0</value>
+    </Toggle_Lock_top_view>
+    <Toggle_Enable_ghost_1>
+        <name>Enable ghost 1</name>
+        <value>0</value>
+    </Toggle_Enable_ghost_1>
+    <Toggle_Enable_ghost_2>
+        <name>Enable ghost 2</name>
+        <value>0</value>
+    </Toggle_Enable_ghost_2>
+    <Button_Set_Center>
+        <name>Set Center</name>
+        <value>0</value>
+    </Button_Set_Center>
+    <Button_Set_Ref_Point>
+        <name>Set Ref Point</name>
+        <value>0</value>
+    </Button_Set_Ref_Point>
+    <Button_Set_Ghost_1>
+        <name>Set Ghost 1</name>
+        <value>0</value>
+    </Button_Set_Ghost_1>
+    <Button_Set_Ghost_2>
+        <name>Set Ghost 2</name>
+        <value>0</value>
+    </Button_Set_Ghost_2>
 </controls>

@@ -37,11 +37,12 @@ class testApp : public ofBaseApp{
     kinectData kinects[K];
     tracker trackers[N];
     matcher match;
-    bool bTracking, bCalibrated, bSaving, pbSaving, bReset;
+    bool bTracking, bCalibrated, bSaving, pbSaving, bReset, bTop;
+    bool bGhost0, bGhost1;
     
      
     void setLineColor(int i);
-    void drawAxes(ofVec3f center);
+    void drawAxes(ofVec3f centroid, ofVec3f refVector);
     
     void pivot(ofVec3f center, float aX, float aY, float aZ);
     void sendPing();
@@ -50,9 +51,12 @@ class testApp : public ofBaseApp{
     void sendAzimuts();
     void sendSaving(int frame);
     void sendReset();
+    void writeLog();
     
     // For calculating the azimuts
-    ofVec2f center;
-    ofVec2f speaker1;
-    ofVec2f refVector;
+    ofVec3f center, refPoint, refVector;
+    
+    
+    // Positions of ghosts users
+    ofVec3f ghost0, ghost1;
 };

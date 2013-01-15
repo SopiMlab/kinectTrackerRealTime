@@ -171,7 +171,7 @@ public:
     }
     void addCOM(ofVec3f c){
         c = M.postMult(c);
-        c.y = 0;
+        c.y = 0; // We don't care about the y axe to avoid noise
         if(coms.size() == 0){
             coms.push_back(c);
             return;

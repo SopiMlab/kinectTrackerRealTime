@@ -13,11 +13,14 @@ ofxSimpleGuiTitle *status;
 ofxSimpleGuiToggle *calibratedButton;
 bool bLoadMLP;
 int frame;
-ofFile myFile;
+
+ofFile logFile;
 int state;
 
+bool bSetCenter, bSetRefPoint, bSetGhost0, bSetGhost1;
 
 
+ofxXmlSettings XML;
 //--------------------------------------------------------------
 void testApp::setup(){
     
@@ -35,51 +38,85 @@ void testApp::setup(){
     
     gui.setup();
 	gui.addTitle("TRACKER \n[i] hide controls");
-    gui.addToggle("TRACK", bTracking);
+    gui.addToggle("TRACK", bTracking).setSize(200, 20);
     calibratedButton = &gui.addToggle("CALIBRATED", bCalibrated);
-    gui.addToggle("SAVE", bSaving);
-    gui.addButton("Load MeshLab File", bLoadMLP);
-    gui.addButton("Reset player", bReset);
+    calibratedButton->setSize(200, 20);
+    gui.addToggle("SAVE", bSaving).setSize(200, 20);
+    gui.addButton("Load MeshLab File", bLoadMLP).setSize(200, 20);
+    gui.addButton("Reset Server Counter", bReset).setSize(200, 20);
 
     gui.addSlider("Zoom", camZoom, -5000, 5000).setSmoothing(0.9);
-    gui.addSlider("camPosX", camPosX, -200, 200).setSmoothing(0.9);;
-    gui.addSlider("camPosY", camPosY, -200, 200).setSmoothing(0.9);;
-    gui.addSlider("camRotX", camRotX, 0, 360).setSmoothing(0.9);;
-    gui.addSlider("camRotY", camRotY, 0, 360).setSmoothing(0.9);;
+    gui.addSlider("camPosX", camPosX, -200, 200).setSmoothing(0.9);
+    gui.addSlider("camPosY", camPosY, -200, 200).setSmoothing(0.9);
+    gui.addSlider("camRotX", camRotX, 0, 360).setSmoothing(0.9);
+    gui.addSlider("camRotY", camRotY, 0, 360).setSmoothing(0.9);
+    gui.addToggle("Lock top view", bTop).setSize(200, 20);
+    gui.addToggle("Enable ghost 1", bGhost0).setSize(200, 20);
+    gui.addToggle("Enable ghost 2", bGhost1).setSize(200, 20);
+    
+    
+    gui.addButton("Set Center", bSetCenter).setSize(200, 20);
+    gui.addButton("Set Ref Point", bSetRefPoint).setSize(200, 20);
+    gui.addButton("Set Ghost 1", bSetGhost0).setSize(200, 20);
+    gui.addButton("Set Ghost 2", bSetGhost1).setSize(200, 20);
     status = &gui.addTitle("STATUS");
     status->setNewColumn(true);
+    
 	gui.loadFromXML();
     gui.show();
     
-    camRotX = 90;
-    
     matrixData.setup();
     
-    // Set space coordinates...
-    center = ofVec2f(550, 2900);
-    speaker1 = ofVec2f(-400, 4350);
-    refVector = center - speaker1;
+    // LOAD space references
+    
+    XML.loadFile(ofToDataPath("xmlSettings.xml"));
+    int cX = XML.getValue("CENTER_X", 0);
+    int cZ = XML.getValue("CENTER_Z", 0);
+    int rX = XML.getValue("REF_X", 0);
+    int rZ = XML.getValue("REF_Z", 0);
+    
+    center = ofVec3f(cX, 0, cZ);
+    refPoint = ofVec3f(rX, 0,  rZ);
+    refVector = center - refPoint;
 
     for(int i = 0; i < K; i++){
         kinects[i].setMatrix(matrixData.getMatrix(i));
         kinects[i].setCenter(center, refVector);
     }
     
+    // LOAD GHOSTS
+    int gX, gZ;
+    
+    gX = XML.getValue("GHOST_0_X", 0);
+    gZ = XML.getValue("GHOST_0_Z", 0);
+    ghost0 = ofVec3f(gX, 0, gZ);
+    
+    gX = XML.getValue("GHOST_1_X", 0);
+    gZ = XML.getValue("GHOST_1_Z", 0);
+    ghost1 = ofVec3f(gX, 0, gZ);
+    
+    cout << "GHOSTs positions... " << endl;
+    cout << ghost0 << endl;
+    cout << ghost1 << endl;
+    //-----
+    
+    
     bTracking = false;
     bCalibrated = false;
     bSaving = false;
     pbSaving = false;
     bReset = false;
+    bTop = false;
     
     
+    // Purge old osc messages
     while(receiver.hasWaitingMessages()){
 		ofxOscMessage m;
 		receiver.getNextMessage(&m);
     }
 
-    // For machine learning
-    myFile.open("data.txt", ofFile::WriteOnly, false);
-    state = 0;
+  
+    //logFile.open("log.txt", ofFile::WriteOnly, false);
 }
 
 //--------------------------------------------------------------
@@ -88,8 +125,7 @@ void testApp::update(){
         kinects[i].markAsOld();
     
     processOSC();
-   
-    
+
     //-------------------------
     
     if(bLoadMLP){
@@ -124,11 +160,11 @@ void testApp::update(){
     sendDistances();
     sendPositions();
     sendAzimuts();
+    
     if(bReset){
         sendReset();
         bReset = false;
     }
-        
     if(bSaving){
         if(!pbSaving){
             frame = 0;
@@ -146,10 +182,11 @@ void testApp::update(){
         sendPing();
     
     
-    //-------------------------
+    //----- SCREEN INFO
     
-    
+
     char msg[2048];
+    
     matrixData.getStatus(msg);
     strcat(msg, oscStatus);
     
@@ -159,49 +196,14 @@ void testApp::update(){
         strcat(msg, kinectMsg);
     }
     char other[500];
-    sprintf(other, "\n[CENTER] %4.f, %4.f", center.x, center.y);
+    sprintf(other, "\n[CENTER] %4.f, %4.f\n[REF POINT] %4.f, %4.f ", center.x, center.y, refPoint.x, refPoint.y);
     strcat(msg, other);
     
     
     float delta[3];
     int n = 0;
 
-    for(int i = 0; i < N - 1; i++)
-        for(int j = i + 1; j < N; j++){
-            delta[n] = trackers[i].lerpedPos.distance(trackers[j].lerpedPos);
-            n ++;
-        }
-    sprintf(other, "\n[DISTANCES] %4.f, %4.f, %4.f", delta[0], delta[1], delta[2]);
-    strcat(msg, other);
-
-    
-    n = 0;
-    for(int i = 0; i < N - 1; i++)
-        for(int j = i + 1; j < N; j++){
-            delta[n] = trackers[i].lerpedPos.distance(trackers[j].lerpedPos) -
-            trackers[i].pLerpedPos.distance(trackers[j].pLerpedPos) ;
-            n ++;
-        }
-    sprintf(other, "\n[DELTA DISTANCES] %4.f, %4.f, %4.f", delta[0], delta[1], delta[2]);
-    strcat(msg, other);
-   
-
-    
-    
-    n = 0;
-    for(int i = 0; i < N; i++){
-        delta[n] = abs((trackers[i].lerpedPos - trackers[i].pLerpedPos).length());
-        n ++;
-    }
-    sprintf(other, "\n[SPEED] %4.f, %4.f, %4.f", delta[0], delta[1], delta[2]);
-    strcat(msg, other);
-    
-    
-    if(kinects[0].getCOMsize() > 0 && kinects[1].getCOMsize() > 0  ){
-        sprintf(other, "\n[COM 0 dist] %4.f", kinects[0].getCOM(0).distance(kinects[1].getCOM(0)));
-        strcat(msg, other);
-    }
-    if(bTracking && bCalibrated){
+     if(bTracking && bCalibrated){
         for(int i = 0; i < N; i++){
             sprintf(other, "\n[TRACKER %d] %4.f %4.f %4.f", i, trackers[i].pos.x,
                     trackers[i].pos.y, trackers[i].pos.z);
@@ -211,33 +213,53 @@ void testApp::update(){
     }
     sprintf(other, "\n[STATE] %1.d", state);
     strcat(msg, other);
+    
+    strcat(msg, "\n\nPRESS AND DRAG:\n'1' cam zoom '2' cam x/y '2' cam rot\n");
+    strcat(msg, "PRESS:\n' ' to start tracking\n");
 
     status->setName(msg);
     status->setSize(300, 400);
     calibratedButton ->setValue(bCalibrated);
-    //-------------------------
-    // Writing machine learning data
-    if(bTracking && bCalibrated){
-        ofVec2f v(trackers[0].lerpedPos.x - center.x, trackers[0].lerpedPos.z - center.y);
-        float angle  = v.angle(-refVector);
-        state = 0;
-        if(keys['1']) state = 1;
-        if(keys['2']) state = 2;
-        if(keys['3']) state = 3;
-        
-        myFile << v.length() << " " << angle << " " << state << endl;
-        cout << v.length() << " " << angle << " " << state << endl;
-        myFile.flush();
+    
+    //----- 
+    
+    //writeLog();
+    
+    // Set references COM0 from Kinect0
+    if(kinects[0].getCOMsize() > 0){
+        if(bSetCenter ) {
+            center = kinects[0].getCOM(0);
+            XML.setValue("CENTER_X", center.x);
+            XML.setValue("CENTER_Z", center.z);
+            XML.saveFile("xmlSettings.xml");
+        }
+        if(bSetRefPoint) {
+            refPoint = kinects[0].getCOM(0);
+            XML.setValue("REF_X", refPoint.x);
+            XML.setValue("REF_Z", refPoint.z);
+            XML.saveFile("xmlSettings.xml");
+        }
+        if(bSetGhost0) {
+            ghost0 = kinects[0].getCOM(0);
+            XML.setValue("GHOST_0_X", ghost0.x);
+            XML.setValue("GHOST_0_Z", ghost0.z);
+            XML.saveFile("xmlSettings.xml");
+        }
+        if(bSetGhost1) {
+            ghost1 = kinects[0].getCOM(0);
+            XML.setValue("GHOST_1_X", ghost1.x);
+            XML.setValue("GHOST_1_Z", ghost1.z);
+            XML.saveFile("xmlSettings.xml");
+        }
     }
+    
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
-    centroid = ofVec3f(0, 0, 4000);
-    centroid.x = center.x;
-    centroid.z = center.y;
+    centroid = center;
+    cam.setPosition(ofVec3f(0, 0, -centroid.z));
     
-	cam.setPosition(ofVec3f(0, 0,-2000));
     cam.lookAt(centroid, ofVec3f(0,1,0));
     cam.setFarClip(50000);
     
@@ -246,9 +268,15 @@ void testApp::draw(){
     ofPushMatrix();
     ofTranslate(camPosX, camPosY, camZoom);
     
-    pivot(centroid, camRotX, camRotY, 0);
+    if(bTop){
+        pivot(centroid, 90, 0, 0);
+    }
+    else{
+        pivot(centroid, camRotX, camRotY, 0);
+    }
+    
     ofScale(-1.0, 1.0, 1.0);
-    drawAxes(centroid);
+    drawAxes(centroid, refPoint);
     
     ofPushStyle();
     
@@ -299,6 +327,8 @@ void testApp::keyPressed(int key){
             bTracking = !bTracking;
             gui.toggleDraw();
             break;
+            
+       
        /*case 'z':
             match.swap(trackers, 0, 1);
             break;
@@ -427,10 +457,10 @@ void testApp::processOSC(){
                 }
             }
             
-            if(_k == 0){
-                kinects[_k].addCOM(ofVec3f(-1700, 1000, 10000)); //NUNO
-                kinects[_k].addCOM(ofVec3f(1500, 0, 10000)); //NUNO2
-                //kinects[0].addCOM(ofVec3f(0, 0, 1500)); //NUNO3
+            
+            if(_k == 0){ //Add ghost test users
+                if(bGhost0) kinects[0].addCOM(ghost0);
+                if(bGhost1) kinects[0].addCOM(ghost1);
             }
 
             
@@ -456,9 +486,9 @@ void testApp::setLineColor(int i){
             break;
     }
 }
-void testApp::drawAxes(ofVec3f center){
+void testApp::drawAxes(ofVec3f centroid, ofVec3f ref){
     ofPushMatrix();
-    ofTranslate(center);
+    ofTranslate(centroid);
     ofPushStyle();
     ofSetColor(255, 0, 0);
     ofLine(0, 0, 0, 200, 0, 0);
@@ -468,6 +498,9 @@ void testApp::drawAxes(ofVec3f center){
     
     ofSetColor(0, 0, 255);
     ofLine(0, 0, 0, 0, 0, 200);
+    
+    ofSetColor(255, 255, 255);
+    ofLine(0, 0, ref.x, ref.z);
     ofPopStyle();
     ofPopMatrix();
 }
@@ -558,4 +591,22 @@ void testApp::sendReset(){
     for(int i = 0; i < K; i++)
         kinects[i].sendReset();
     
+}
+
+void testApp::writeLog(){
+//    //-------------------------
+//    // Writing machine learning data
+//   if(bTracking && bCalibrated){
+//        ofVec2f v(trackers[0].lerpedPos.x - center.x, trackers[0].lerpedPos.z - center.y);
+//        float angle  = v.angle(-refVector);
+//      /*  state = 0;
+//        if(keys['1']) state = 1;
+//        if(keys['2']) state = 2;
+//        if(keys['3']) state = 3;
+//        */
+//        
+//        logFile << v.length() << " " << angle << " " << state << endl;
+//        cout << v.length() << " " << angle << " " << state << endl;
+//        logFile.flush();
+//    }
 }
