@@ -116,7 +116,7 @@ void testApp::setup(){
     }
 
   
-    //logFile.open("log.txt", ofFile::WriteOnly, false);
+    logFile.open("log.txt", ofFile::WriteOnly, false);
 }
 
 //--------------------------------------------------------------
@@ -244,7 +244,7 @@ void testApp::draw(){
     ofTranslate(camPosX, camPosY, camZoom);
     
     if(bTop){
-        pivot(centroid, 90, 0, 0);
+        pivot(centroid, 110, 0, 0);
     }
     else{
         pivot(centroid, camRotX, camRotY, 0);
@@ -465,7 +465,6 @@ void testApp::processOSC(){
                 if(bGhost0) kinects[0].addCOM(ghost0);
                 if(bGhost1) kinects[0].addCOM(ghost1);
                 
-                
             }
 
             
@@ -599,19 +598,22 @@ void testApp::sendReset(){
 }
 
 void testApp::writeLog(){
-//    //-------------------------
-//    // Writing machine learning data
-//   if(bTracking && bCalibrated){
-//        ofVec3f v(trackers[0].lerpedPos.x - center.x, 0, trackers[0].lerpedPos.z - center.y);
-//        float angle  = v.angle(-refVector);
-//      /*  state = 0;
-//        if(keys['1']) state = 1;
-//        if(keys['2']) state = 2;
-//        if(keys['3']) state = 3;
-//        */
-//        
-//        logFile << v.length() << " " << angle << " " << state << endl;
-//        cout << v.length() << " " << angle << " " << state << endl;
-//        logFile.flush();
-//    }
+    //-------------------------
+    // Writing machine learning data
+    if(bTracking && bCalibrated){
+        state = 0; // state is used for machine learning mark-up
+        if(keys['1']) state = 1;
+        if(keys['2']) state = 2;
+       // if(keys['3']) state = 3;
+       
+        
+       logFile << trackers[0].lerpedPos.x << " " << trackers[0].lerpedPos.z << " "
+        << trackers[1].lerpedPos.x << " " << trackers[1].lerpedPos.z << " "
+        << trackers[2].lerpedPos.x << " " << trackers[2].lerpedPos.z << " " << state << endl;
+        
+        cout << trackers[0].lerpedPos.x << " " << trackers[0].lerpedPos.z << " "
+        << trackers[1].lerpedPos.x << " " << trackers[1].lerpedPos.z << " "
+        << trackers[2].lerpedPos.x << " " << trackers[2].lerpedPos.z << " " << state << endl;
+        logFile.flush();
+    }
 }
