@@ -78,7 +78,8 @@ void testApp::setup(){
     center = ofVec3f(cX, 0, cZ);
     refPoint = ofVec3f(rX, 0,  rZ);
     refVector = center - refPoint;
-
+    
+    
     for(int i = 0; i < K; i++){
         kinects[i].setMatrix(matrixData.getMatrix(i));
         kinects[i].setCenter(center, refVector);
@@ -95,9 +96,6 @@ void testApp::setup(){
     gZ = XML.getValue("GHOST_1_Z", 0);
     ghost1 = ofVec3f(gX, 0, gZ);
     
-    cout << "GHOSTs positions... " << endl;
-    cout << ghost0 << endl;
-    cout << ghost1 << endl;
     //-----
     
     
@@ -196,7 +194,8 @@ void testApp::update(){
         strcat(msg, kinectMsg);
     }
     char other[500];
-    sprintf(other, "\n[CENTER] %4.f, %4.f\n[REF POINT] %4.f, %4.f ", center.x, center.z, refPoint.x, refPoint.z);
+    sprintf(other, "\n[CENTER] %4.f, %4.f\n[REF POINT] %4.f, %4.f\n[REF VECTOR] %4.f, %4.f ",
+                center.x, center.z, refPoint.x, refPoint.z, refVector.x, refVector.z);
     strcat(msg, other);
     
     sprintf(other, "\n[GHOST 1] %4.f, %4.f\n[GHOST 2] %4.f, %4.f ", ghost0.x, ghost0.z, ghost1.x, ghost1.z);
@@ -226,8 +225,7 @@ void testApp::update(){
     //----- 
     // ...
     //writeLog();
-    
-       
+
 }
 
 //--------------------------------------------------------------
@@ -462,8 +460,8 @@ void testApp::processOSC(){
 
             
             if(_k == 0){ //Add ghost test users
-                if(bGhost0) kinects[0].addCOM(ghost0);
-                if(bGhost1) kinects[0].addCOM(ghost1);
+                if(bGhost0) kinects[_k].addCOM(ghost0);
+                if(bGhost1) kinects[_k].addCOM(ghost1);
                 
             }
 
@@ -541,8 +539,9 @@ void testApp::sendAzimuts() {
     ofxOscMessage m;
     m.setAddress("/azimuts");
     for(int i = 0; i < N; i++){
-        ofVec3f v(trackers[i].lerpedPos.x - center.x, 0, trackers[i].lerpedPos.z - center.z);
-        float angle  = v.angle(-refVector);
+        ofVec2f v(trackers[i].lerpedPos.x - center.x, trackers[i].lerpedPos.z - center.z);
+        ofVec2f r(refVector.x, refVector.z);
+        float angle  = v.angle(-r);
         m.addFloatArg(angle);
         m.addFloatArg(v.length());
     }

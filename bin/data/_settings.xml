@@ -1,7 +1,7 @@
 <controls>
     <Toggle_TRACK>
         <name>TRACK</name>
-        <value>1</value>
+        <value>0</value>
     </Toggle_TRACK>
     <Toggle_CALIBRATED>
         <name>CALIBRATED</name>
@@ -25,19 +25,19 @@
     </SliderFloat_Zoom>
     <SliderFloat_camPosX>
         <name>camPosX</name>
-        <value>92</value>
+        <value>26</value>
     </SliderFloat_camPosX>
     <SliderFloat_camPosY>
         <name>camPosY</name>
-        <value>-74</value>
+        <value>160</value>
     </SliderFloat_camPosY>
     <SliderFloat_camRotX>
         <name>camRotX</name>
-        <value>113.4</value>
+        <value>103.5</value>
     </SliderFloat_camRotX>
     <SliderFloat_camRotY>
         <name>camRotY</name>
-        <value>1.80005</value>
+        <value>17.4001</value>
     </SliderFloat_camRotY>
     <Toggle_Lock_top_view>
         <name>Lock top view</name>
@@ -45,11 +45,11 @@
     </Toggle_Lock_top_view>
     <Toggle_Enable_ghost_1>
         <name>Enable ghost 1</name>
-        <value>0</value>
+        <value>1</value>
     </Toggle_Enable_ghost_1>
     <Toggle_Enable_ghost_2>
         <name>Enable ghost 2</name>
-        <value>0</value>
+        <value>1</value>
     </Toggle_Enable_ghost_2>
     <Button_Set_Center>
         <name>Set Center</name>
