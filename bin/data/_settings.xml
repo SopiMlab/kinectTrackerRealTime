@@ -45,11 +45,11 @@
     </Toggle_Lock_top_view>
     <Toggle_Enable_ghost_1>
         <name>Enable ghost 1</name>
-        <value>1</value>
+        <value>0</value>
     </Toggle_Enable_ghost_1>
     <Toggle_Enable_ghost_2>
         <name>Enable ghost 2</name>
-        <value>1</value>
+        <value>0</value>
     </Toggle_Enable_ghost_2>
     <Button_Set_Center>
         <name>Set Center</name>
