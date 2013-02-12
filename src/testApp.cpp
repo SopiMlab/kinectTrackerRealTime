@@ -115,6 +115,10 @@ void testApp::setup(){
 
   
     logFile.open("log.txt", ofFile::WriteOnly, false);
+    
+    
+    bGhost0 = true;
+    bGhost1 = true;
 }
 
 //--------------------------------------------------------------
@@ -195,7 +199,8 @@ void testApp::update(){
     }
     char other[500];
     sprintf(other, "\n[CENTER] %4.f, %4.f\n[REF POINT] %4.f, %4.f\n[REF VECTOR] %4.f, %4.f ",
-                center.x, center.z, refPoint.x, refPoint.z, refVector.x, refVector.z);
+                center.x, center.z, refPoint.x,
+                refPoint.z, refVector.x, refVector.z);
     strcat(msg, other);
     
     sprintf(other, "\n[GHOST 1] %4.f, %4.f\n[GHOST 2] %4.f, %4.f ", ghost0.x, ghost0.z, ghost1.x, ghost1.z);
@@ -215,8 +220,8 @@ void testApp::update(){
     sprintf(other, "\n[STATE] %1.d", state);
     strcat(msg, other);
     
-    strcat(msg, "\n\nPRESS AND DRAG:\n'1' cam zoom '2' cam x/y '2' cam rot\n");
-    strcat(msg, "PRESS:\n' ' to start tracking\n");
+    strcat(msg, "\n\nPRESS AND DRAG:\n[1] cam zoom [2] cam x/y [2] cam rot\n");
+    strcat(msg, "PRESS:\n[ ] to start tracking\n");
 
     status->setName(msg);
     status->setSize(300, 400);
@@ -242,7 +247,7 @@ void testApp::draw(){
     ofTranslate(camPosX, camPosY, camZoom);
     
     if(bTop){
-        pivot(centroid, 110, 0, 0);
+        pivot(centroid, 100, 0, 0);
     }
     else{
         pivot(centroid, camRotX, camRotY, 0);
@@ -293,6 +298,9 @@ void testApp::draw(){
 void testApp::keyPressed(int key){
     
     switch (key ) {
+        case 'c':
+            center = kinects[0].getCOM(0);
+            break;
         case 'i':
             gui.toggleDraw();
             break;
@@ -377,7 +385,16 @@ void testApp::dragEvent(ofDragInfo dragInfo){
 }
 
 void testApp::processOSC(){
-   
+   /* int _k = 0;
+    if(_k == 0){ //Add ghost test users
+        kinects[_k].clearCOM();
+        kinects[_k].markAsNew();
+        if(bGhost0) kinects[_k].addCOM(ghost0);
+        if(bGhost1) kinects[_k].addCOM(ghost1);
+        kinects[_k].addCOM(ofVec3f((mouseX - ofGetWindowWidth()/2) * 10, 0,
+                                   (mouseY - ofGetWindowHeight()/2 + 500) * 10));
+        
+    }*/
 	while(receiver.hasWaitingMessages()){
         
         char *data;
@@ -457,16 +474,10 @@ void testApp::processOSC(){
                     XML.saveFile("xmlSettings.xml");
                 }
             }
-
-            
             if(_k == 0){ //Add ghost test users
                 if(bGhost0) kinects[_k].addCOM(ghost0);
                 if(bGhost1) kinects[_k].addCOM(ghost1);
-                
             }
-
-            
-
         }
 	}
     
@@ -539,12 +550,16 @@ void testApp::sendAzimuts() {
     ofxOscMessage m;
     m.setAddress("/azimuts");
     for(int i = 0; i < N; i++){
-        ofVec2f v(trackers[i].lerpedPos.x - center.x, trackers[i].lerpedPos.z - center.z);
+        ofVec2f v(trackers[i].lerpedPos.x - center.x,
+                  trackers[i].lerpedPos.z - center.z);
         ofVec2f r(refVector.x, refVector.z);
         float angle  = v.angle(-r);
         m.addFloatArg(angle);
         m.addFloatArg(v.length());
+        // AZIMUTS
+        //  cout << "(" << int(angle) << ", " << int(v.length()) << ") " ;
     }
+   // cout << endl;
     sender.sendMessage(m);
     
 }

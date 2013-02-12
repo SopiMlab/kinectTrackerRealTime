@@ -200,9 +200,11 @@ public:
             
             ofVec3f pp;
             pp.x = coms[i].x - center.x;
-            pp.y = coms[i].z - center.y;            
+            pp.y = coms[i].z - center.z;
             if(i < coms.size()){
-                sprintf(comPos, "(%4.f, %4.f, %4.f) [%4.f, %4.f]", coms[i].x, coms[i].y, coms[i].z, pp.angle(-ref), pp.length());
+                sprintf(comPos, "(%4.f, %4.f, %4.f) [%4.f, %4.f]",
+                        coms[i].x, coms[i].y, coms[i].z,
+                        pp.angle(-ref), pp.length());
                 strcat(comPosAll, comPos);
             }
             strcat(comPosAll, "\n");
