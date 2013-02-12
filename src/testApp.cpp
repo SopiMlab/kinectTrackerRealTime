@@ -116,7 +116,7 @@ void testApp::setup(){
   
     logFile.open("log.txt", ofFile::WriteOnly, false);
     /*
-    
+    AAAAAdasdasdadsa
     bGhost0 = true;
     bGhost1 = true;
      */
