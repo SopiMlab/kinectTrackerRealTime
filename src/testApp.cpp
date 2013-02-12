@@ -115,10 +115,11 @@ void testApp::setup(){
 
   
     logFile.open("log.txt", ofFile::WriteOnly, false);
-    
+    /*
     
     bGhost0 = true;
     bGhost1 = true;
+     */
 }
 
 //--------------------------------------------------------------
