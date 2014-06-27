@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>9BF61C35-4327-4ABF-97AB-0B013046D239</string>
+	<key>IDESourceControlProjectName</key>
+	<string>kinectTrackerRealTime</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>CE55B698-4CBC-4E5D-A87F-056B319EB1E1</key>
+		<string>https://github.com/SopiMlab/kinectTrackerRealTime.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>kinectTrackerRealTime.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>CE55B698-4CBC-4E5D-A87F-056B319EB1E1</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/SopiMlab/kinectTrackerRealTime.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>CE55B698-4CBC-4E5D-A87F-056B319EB1E1</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>CE55B698-4CBC-4E5D-A87F-056B319EB1E1</string>
+			<key>IDESourceControlWCCName</key>
+			<string>kinectTrackerRealTime</string>
+		</dict>
+	</array>
+</dict>
+</plist>
